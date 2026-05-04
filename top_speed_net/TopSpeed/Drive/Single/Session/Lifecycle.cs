@@ -87,6 +87,7 @@ namespace TopSpeed.Drive.Single
 
         public void Dispose()
         {
+            _edgeProximityBeep.Dispose();
             _soundQueue.Clear();
             _panelManager.Dispose();
             _localRadio.Dispose();

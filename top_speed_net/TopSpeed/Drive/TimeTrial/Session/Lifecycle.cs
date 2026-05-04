@@ -72,6 +72,7 @@ namespace TopSpeed.Drive.TimeTrial
 
         public void Dispose()
         {
+            _edgeProximityBeep.Dispose();
             _soundQueue.Clear();
             _panelManager.Dispose();
             _localRadio.Dispose();

@@ -1,8 +1,8 @@
 name: Release Build
 
 on:
-    workflow_dispatch:
-    push:
+  workflow_dispatch:
+  push:
     branches: [ "main", "master" ]
     paths-ignore:
       - ".gitignore"

@@ -25,6 +25,9 @@ namespace TopSpeed.Core.Settings
             settings.Difficulty = ReadEnum(race.Difficulty, settings.Difficulty, "race.difficulty", issues);
             settings.Units = ReadEnum(race.Units, settings.Units, "race.units", issues);
 
+            if (race.WallProximityFeedback.HasValue)
+                settings.WallProximityFeedback = race.WallProximityFeedback.Value;
+
             if (race.RandomCustomTracks.HasValue)
                 settings.RandomCustomTracks = race.RandomCustomTracks.Value;
             if (race.RandomCustomVehicles.HasValue)

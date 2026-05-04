@@ -7,7 +7,7 @@ namespace TopSpeed.Audio
 {
     internal sealed partial class AudioManager
     {
-        public void PlayTriangleTone(double frequencyHz, int durationMs, float volume = 0.35f)
+        public void PlayTriangleTone(double frequencyHz, int durationMs, float volume = 0.35f, float pan = 0f)
         {
             if (frequencyHz <= 0d || durationMs <= 0)
                 return;
@@ -21,9 +21,15 @@ namespace TopSpeed.Audio
             if (remainder != 0)
                 totalFrames += samplesPerCycle - remainder;
 
+            var clampedPan = Math.Clamp(pan, -1f, 1f);
             var wave = BuildTriangleToneWave(sampleRate, samplesPerCycle, totalFrames);
             var asset = _engine.CreateBufferAsset(wave, "ui-tone");
-            _engine.PlayOneShot(asset, AudioEngineOptions.UiBusName, configure: source => source.SetVolume(volume), spatialize: false, useHrtf: false);
+            _engine.PlayOneShot(asset, AudioEngineOptions.UiBusName, configure: source =>
+            {
+                source.SetVolume(volume);
+                if (clampedPan != 0f)
+                    source.SetPan(clampedPan);
+            }, spatialize: false, useHrtf: false);
             asset.Dispose();
         }
 

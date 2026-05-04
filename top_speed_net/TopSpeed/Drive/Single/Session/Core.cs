@@ -19,6 +19,7 @@ using CollisionsSubsystem = TopSpeed.Drive.Single.Session.Systems.Collisions;
 using CommentarySubsystem = TopSpeed.Drive.Single.Session.Systems.Commentary;
 using ProgressSubsystem = TopSpeed.Drive.Single.Session.Systems.Progress;
 using CoreRequestsSubsystem = TopSpeed.Drive.Session.Systems.CoreRequests;
+using EdgeProximityBeepSubsystem = TopSpeed.Drive.Session.Systems.EdgeProximityBeep;
 using ExitSubsystem = TopSpeed.Drive.Session.Systems.Exit;
 using GeneralRequestsSubsystem = TopSpeed.Drive.Session.Systems.GeneralRequests;
 using ListenerSubsystem = TopSpeed.Drive.Session.Systems.Listener;
@@ -84,6 +85,7 @@ namespace TopSpeed.Drive.Single
         private readonly ProgressSubsystem _progress;
         private readonly CommentarySubsystem _commentary;
         private readonly CollisionsSubsystem _collisions;
+        private readonly EdgeProximityBeepSubsystem _edgeProximityBeep;
 
         private Track.Road _currentRoad;
         private CarState _lastRecordedCarState;
@@ -270,6 +272,7 @@ namespace TopSpeed.Drive.Single
                 SpeakIfLoaded,
                 Speak);
             _collisions = new CollisionsSubsystem("collisions", 150, _track, _car, _computerPlayers, () => _playerNumber, () => _nComputerPlayers);
+            _edgeProximityBeep = new EdgeProximityBeepSubsystem("edgeProximityBeep", 125, _car, _track, _audio, _settings, () => _started);
 
             _session = CreateSession();
         }
@@ -283,15 +286,15 @@ namespace TopSpeed.Drive.Single
             var allowedExternalEvents = Defaults.NoExternalEvents;
             var policy = new PolicyBuilder(Phase.Initializing, Phase.Countdown)
                 .Add(Phase.Initializing, false, false, InputPolicy.Create(false, true, false), Defaults.NoSubsystems, allowedCommands, allowedExternalEvents, new[] { Phase.Countdown, Phase.Aborted })
-                .Add(Phase.Countdown, true, true, InputPolicy.Create(true, true, true), PhaseDefinition.Subsystems(_bots, _panels, _playerVehicle, _progress, _listener, _coreRequests, _commentary, _playerInfo, _generalRequests, _exit), allowedCommands, allowedExternalEvents, new[] { Phase.Running, Phase.Paused, Phase.Aborted })
-                .Add(Phase.Running, true, true, InputPolicy.Create(true, true, true), PhaseDefinition.Subsystems(_bots, _panels, _playerVehicle, _progress, _listener, _collisions, _coreRequests, _commentary, _playerInfo, _generalRequests, _exit), allowedCommands, allowedExternalEvents, new[] { Phase.Paused, Phase.Finished, Phase.Aborted })
+                .Add(Phase.Countdown, true, true, InputPolicy.Create(true, true, true), PhaseDefinition.Subsystems(_bots, _panels, _playerVehicle, _edgeProximityBeep, _progress, _listener, _coreRequests, _commentary, _playerInfo, _generalRequests, _exit), allowedCommands, allowedExternalEvents, new[] { Phase.Running, Phase.Paused, Phase.Aborted })
+                .Add(Phase.Running, true, true, InputPolicy.Create(true, true, true), PhaseDefinition.Subsystems(_bots, _panels, _playerVehicle, _edgeProximityBeep, _progress, _listener, _collisions, _coreRequests, _commentary, _playerInfo, _generalRequests, _exit), allowedCommands, allowedExternalEvents, new[] { Phase.Paused, Phase.Finished, Phase.Aborted })
                 .Add(Phase.Paused, false, false, InputPolicy.Create(false, true, false), Defaults.NoSubsystems, allowedCommands, allowedExternalEvents, new[] { Phase.Countdown, Phase.Running, Phase.Finished, Phase.Aborted })
                 .Add(Phase.Finished, true, true, InputPolicy.Create(false, true, false), PhaseDefinition.Subsystems(_bots, _playerVehicle, _listener, _exit), allowedCommands, allowedExternalEvents, new[] { Phase.Aborted })
                 .Add(Phase.Aborted, false, false, InputPolicy.Create(false, true, false), Defaults.NoSubsystems, allowedCommands, allowedExternalEvents, Array.Empty<Phase>())
                 .Build();
 
             var builder = new SessionBuilder(policy);
-            builder.AddSubsystems(_bots, _panels, _playerVehicle, _progress, _listener, _collisions, _coreRequests, _commentary, _playerInfo, _generalRequests, _exit);
+            builder.AddSubsystems(_bots, _panels, _playerVehicle, _edgeProximityBeep, _progress, _listener, _collisions, _coreRequests, _commentary, _playerInfo, _generalRequests, _exit);
             builder.AddEventHandler(new HandlerId("single.events"), 100, HandleSessionEvent);
             builder.AddEventHandler(new HandlerId("single.phase"), 200, HandlePhaseEvent);
             return builder.Build();

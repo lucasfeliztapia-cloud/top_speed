@@ -16,6 +16,7 @@ using TopSpeed.Vehicles.Control;
 using TopSpeed.Vehicles.Core;
 using TS.Audio;
 using CoreRequestsSubsystem = TopSpeed.Drive.Session.Systems.CoreRequests;
+using EdgeProximityBeepSubsystem = TopSpeed.Drive.Session.Systems.EdgeProximityBeep;
 using ExitSubsystem = TopSpeed.Drive.Session.Systems.Exit;
 using GeneralRequestsSubsystem = TopSpeed.Drive.Session.Systems.GeneralRequests;
 using ListenerSubsystem = TopSpeed.Drive.Session.Systems.Listener;
@@ -72,6 +73,7 @@ namespace TopSpeed.Drive.TimeTrial
         private readonly PlayerInfoSubsystem _playerInfo;
         private readonly ExitSubsystem _exit;
         private readonly TrackAudioService _trackAudio;
+        private readonly EdgeProximityBeepSubsystem _edgeProximityBeep;
 
         private uint _nextMediaId;
         private Track.Road _currentRoad;
@@ -190,6 +192,7 @@ namespace TopSpeed.Drive.TimeTrial
                 _ => GetVehicleName(),
                 () => _started,
                 SpeakText);
+            _edgeProximityBeep = new EdgeProximityBeepSubsystem("edgeProximityBeep", 125, _car, _track, _audio, _settings, () => _started);
             _exit = new ExitSubsystem(
                 "exit",
                 300,
@@ -223,8 +226,8 @@ namespace TopSpeed.Drive.TimeTrial
             var allowedExternalEvents = Defaults.NoExternalEvents;
             var policy = new PolicyBuilder(Phase.Initializing, Phase.Countdown)
                 .Add(Phase.Initializing, false, false, InputPolicy.Create(false, true, false), Defaults.NoSubsystems, allowedCommands, allowedExternalEvents, new[] { Phase.Countdown, Phase.Aborted })
-                .Add(Phase.Countdown, true, true, InputPolicy.Create(true, true, true), PhaseDefinition.Subsystems(_panels, _playerVehicle, _progress, _listener, _coreRequests, _generalRequests, _playerInfo, _exit), allowedCommands, allowedExternalEvents, new[] { Phase.Running, Phase.Paused, Phase.Aborted })
-                .Add(Phase.Running, true, true, InputPolicy.Create(true, true, true), PhaseDefinition.Subsystems(_panels, _playerVehicle, _progress, _listener, _coreRequests, _generalRequests, _playerInfo, _exit), allowedCommands, allowedExternalEvents, new[] { Phase.Paused, Phase.Finishing, Phase.Finished, Phase.Aborted })
+                .Add(Phase.Countdown, true, true, InputPolicy.Create(true, true, true), PhaseDefinition.Subsystems(_panels, _playerVehicle, _edgeProximityBeep, _progress, _listener, _coreRequests, _generalRequests, _playerInfo, _exit), allowedCommands, allowedExternalEvents, new[] { Phase.Running, Phase.Paused, Phase.Aborted })
+                .Add(Phase.Running, true, true, InputPolicy.Create(true, true, true), PhaseDefinition.Subsystems(_panels, _playerVehicle, _edgeProximityBeep, _progress, _listener, _coreRequests, _generalRequests, _playerInfo, _exit), allowedCommands, allowedExternalEvents, new[] { Phase.Paused, Phase.Finishing, Phase.Finished, Phase.Aborted })
                 .Add(Phase.Paused, false, false, InputPolicy.Create(false, true, false), Defaults.NoSubsystems, allowedCommands, allowedExternalEvents, new[] { Phase.Countdown, Phase.Running, Phase.Finishing, Phase.Aborted })
                 .Add(Phase.Finishing, true, true, InputPolicy.Create(false, true, false), PhaseDefinition.Subsystems(_playerVehicle, _listener, _exit), allowedCommands, allowedExternalEvents, new[] { Phase.Finished, Phase.Aborted })
                 .Add(Phase.Finished, true, true, InputPolicy.Create(false, true, false), PhaseDefinition.Subsystems(_playerVehicle, _listener, _exit), allowedCommands, allowedExternalEvents, new[] { Phase.Aborted })
@@ -232,7 +235,7 @@ namespace TopSpeed.Drive.TimeTrial
                 .Build();
 
             var builder = new SessionBuilder(policy);
-            builder.AddSubsystems(_panels, _playerVehicle, _progress, _listener, _coreRequests, _generalRequests, _playerInfo, _exit);
+            builder.AddSubsystems(_panels, _playerVehicle, _edgeProximityBeep, _progress, _listener, _coreRequests, _generalRequests, _playerInfo, _exit);
             builder.AddEventHandler(new HandlerId("timeTrial.events"), 100, HandleSessionEvent);
             builder.AddEventHandler(new HandlerId("timeTrial.phase"), 200, HandlePhaseEvent);
             return builder.Build();

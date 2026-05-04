@@ -7,7 +7,7 @@ namespace TopSpeed.Audio
         void SetMasterVolume(float volume);
         void StartUpdateThread(int intervalMs = 8);
         void StopUpdateThread();
-        void PlayTriangleTone(double frequencyHz, int durationMs, float volume = 0.35f);
+        void PlayTriangleTone(double frequencyHz, int durationMs, float volume = 0.35f, float pan = 0f);
     }
 }
 

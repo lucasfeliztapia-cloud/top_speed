@@ -188,6 +188,7 @@ namespace TopSpeed.Core.Settings
         [DataMember(Name = "numberOfComputers")] public int? NumberOfComputers { get; set; }
         [DataMember(Name = "difficulty")] public int? Difficulty { get; set; }
         [DataMember(Name = "units")] public int? Units { get; set; }
+        [DataMember(Name = "wallProximityFeedback")] public bool? WallProximityFeedback { get; set; }
         [DataMember(Name = "randomCustomTracks")] public bool? RandomCustomTracks { get; set; }
         [DataMember(Name = "randomCustomVehicles")] public bool? RandomCustomVehicles { get; set; }
         [DataMember(Name = "singleRaceCustomVehicles")] public bool? SingleRaceCustomVehicles { get; set; }

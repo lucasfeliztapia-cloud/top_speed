@@ -39,6 +39,7 @@ namespace TopSpeed.Input
         public bool HrtfAudio { get; set; }
         public bool StereoWidening { get; set; }
         public bool AutoDetectAudioDeviceFormat { get; set; }
+        public bool WallProximityFeedback { get; set; }
         public bool RandomCustomTracks { get; set; }
         public bool RandomCustomVehicles { get; set; }
         public bool SingleRaceCustomVehicles { get; set; }
@@ -124,6 +125,7 @@ namespace TopSpeed.Input
             HrtfAudio = true;
             StereoWidening = false;
             AutoDetectAudioDeviceFormat = true;
+            WallProximityFeedback = false;
             RandomCustomTracks = false;
             RandomCustomVehicles = false;
             SingleRaceCustomVehicles = false;

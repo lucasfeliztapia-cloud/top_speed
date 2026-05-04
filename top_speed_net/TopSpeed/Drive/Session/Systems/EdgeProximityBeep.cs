@@ -12,8 +12,8 @@ namespace TopSpeed.Drive.Session.Systems
     {
         // Center 30% of road is silent (dead zone = 0.15 from center on each side)
         private const float DeadZone = 0.15f;
-        private const double MinFrequencyHz = 150.0;
-        private const double MaxFrequencyHz = 650.0;
+        private const float MinFrequencyHz = 150f;
+        private const float MaxFrequencyHz = 650f;
         private const float MaxToneVolume = 0.20f;
         private const uint ToneSampleRate = 44100;
 
@@ -24,9 +24,9 @@ namespace TopSpeed.Drive.Session.Systems
 
         // Desired frequency for each side.
         // Written by Update() on the game thread, read by audio callbacks on the audio thread.
-        // volatile ensures the audio thread always sees the latest value.
-        private volatile double _leftFrequencyHz = MinFrequencyHz;
-        private volatile double _rightFrequencyHz = MinFrequencyHz;
+        // float is used because volatile is not permitted on double in C#.
+        private volatile float _leftFrequencyHz = MinFrequencyHz;
+        private volatile float _rightFrequencyHz = MinFrequencyHz;
 
         // Phase accumulators for sine generation — only ever touched by the audio callback thread.
         private double _leftPhase;
